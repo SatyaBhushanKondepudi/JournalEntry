@@ -1,7 +1,7 @@
-package com.satyabhushan.journalApp.controller;
+package com.satyabhushan.journalapp.controller;
 
-import com.satyabhushan.journalApp.entity.User;
-import com.satyabhushan.journalApp.service.UserService;
+import com.satyabhushan.journalapp.entity.User;
+import com.satyabhushan.journalapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +12,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-    @Autowired
+
     private UserService userService;
+
+    public AdminController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/all-users")
     public ResponseEntity<?> getAllUsers() {
@@ -26,6 +30,7 @@ public class AdminController {
 
     @PostMapping("/create-admin-user")
     public void createAdminUser(@RequestBody User user){
+        userService.checkUserWithUserName(user.getUserName());
         userService.saveAdminUserEntryByEncryptedPassword(user);
     }
 }

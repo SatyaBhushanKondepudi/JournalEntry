@@ -1,9 +1,10 @@
-package com.satyabhushan.journalApp.configs;
+package com.satyabhushan.journalapp.configs;
 
-import com.satyabhushan.journalApp.service.UserDetailsServiceImpl;
+import com.satyabhushan.journalapp.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,20 +16,20 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SpringSecurity {
+@Profile("prod")
+public class SpringSecurityProd {
 
-
-    @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    public SpringSecurityProd(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(request -> request
-                                .requestMatchers("/public/**").permitAll()
-                                .requestMatchers("/journal/**" , "/user/**").authenticated()
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .anyRequest().permitAll())
+                                .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();

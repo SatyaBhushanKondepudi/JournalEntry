@@ -1,4 +1,4 @@
-package com.satyabhushan.journalApp.configs;
+package com.satyabhushan.journalapp.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

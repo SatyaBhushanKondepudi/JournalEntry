@@ -1,20 +1,19 @@
-package com.satyabhushan.journalApp.controller;
+package com.satyabhushan.journalapp.controller;
 
-import com.satyabhushan.journalApp.entity.JournalEntry;
-import com.satyabhushan.journalApp.entity.User;
-import com.satyabhushan.journalApp.service.JournalEntryService;
-import com.satyabhushan.journalApp.service.UserService;
+import com.satyabhushan.journalapp.entity.JournalEntry;
+import com.satyabhushan.journalapp.entity.User;
+import com.satyabhushan.journalapp.exceptions.JournalEntryNotFoundException;
+import com.satyabhushan.journalapp.exceptions.UserNotFoundWithGivenUserName;
+import com.satyabhushan.journalapp.service.JournalEntryService;
+import com.satyabhushan.journalapp.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,17 +38,18 @@ public class JournalEntryControllerV2 {
 //    }
 
     @GetMapping
-    public ResponseEntity<List<JournalEntry>> getAllJournalEntriesOfUser(){
+    public ResponseEntity<List<JournalEntry>> getAllJournalEntriesOfUser() throws UserNotFoundWithGivenUserName {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
-        Optional<User> user = userService.findByUserName(userName);
-        if(user.isPresent()){
-            List<JournalEntry> journalEntriesList = user.get().getJournalEntries();
-            if(journalEntriesList != null && !journalEntriesList.isEmpty()){
-                return new ResponseEntity<>(journalEntriesList , OK);
-            }
+        User user = userService.findByUserName(userName);
+        List<JournalEntry> journalEntriesList = user.getJournalEntries();
+        if(journalEntriesList != null && !journalEntriesList.isEmpty()) {
+            return new ResponseEntity<>(journalEntriesList, OK);
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        else{
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
     }
 
     @PostMapping
@@ -65,11 +65,11 @@ public class JournalEntryControllerV2 {
     }
 
     @GetMapping("/id/{myID}")
-    public ResponseEntity<JournalEntry> getJournalEntryById(@PathVariable ObjectId myID){
+    public ResponseEntity<JournalEntry> getJournalEntryById(@PathVariable ObjectId myID) throws UserNotFoundWithGivenUserName {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
-        Optional<User> user = userService.findByUserName(userName);
-        List<JournalEntry> findTheMatchingJournalEntryWithGivenID = user.get().getJournalEntries()
+        User user = userService.findByUserName(userName);
+        List<JournalEntry> findTheMatchingJournalEntryWithGivenID = user.getJournalEntries()
                 .stream()
                 .filter(journalEntry -> (journalEntry.getId().equals(myID)))
                 .collect(Collectors.toList());
@@ -81,7 +81,7 @@ public class JournalEntryControllerV2 {
     }
 
     @DeleteMapping("/id/{myID}")
-    public ResponseEntity<?> deleteJournalEntryByIdInBothJounalEntryAndUserTable( @PathVariable ObjectId myID){
+    public ResponseEntity<?> deleteJournalEntryByIdInBothJounalEntryAndUserTable( @PathVariable ObjectId myID) throws JournalEntryNotFoundException, UserNotFoundWithGivenUserName {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         boolean response = journalEntryService.deleteById(myID, userName);
@@ -94,11 +94,11 @@ public class JournalEntryControllerV2 {
     @PutMapping("/id/{myID}")
     public ResponseEntity<JournalEntry> updateJournalEntryById(@PathVariable ObjectId myID,
                                                                @RequestBody JournalEntry newEntry
-    ){
+    ) throws UserNotFoundWithGivenUserName {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
-        Optional<User> user = userService.findByUserName(userName);
-        List<JournalEntry> findTheMatchingJournalEntryWithGivenID = user.get().getJournalEntries()
+        User user = userService.findByUserName(userName);
+        List<JournalEntry> findTheMatchingJournalEntryWithGivenID = user.getJournalEntries()
                 .stream()
                 .filter(journalEntry -> (journalEntry.getId().equals(myID)))
                 .collect(Collectors.toList());

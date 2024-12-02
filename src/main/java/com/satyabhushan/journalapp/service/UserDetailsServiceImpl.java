@@ -1,7 +1,7 @@
-package com.satyabhushan.journalApp.service;
+package com.satyabhushan.journalapp.service;
 
-import com.satyabhushan.journalApp.entity.User;
-import com.satyabhushan.journalApp.repository.UserRepository;
+import com.satyabhushan.journalapp.entity.User;
+import com.satyabhushan.journalapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
