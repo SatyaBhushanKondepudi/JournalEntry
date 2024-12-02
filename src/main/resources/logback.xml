@@ -27,7 +27,6 @@
         <appender-ref ref="myConsoleAppender"/>
         <appender-ref ref="myFileAppender"/>
     </root>
-    <logger name="org.mongodb.driver" level="DEBUG"/>
 <!--    <logger name="com.satyabhushan.journalapp" level="INFO" additivity="false">-->
 <!--        -->
 <!--    </logger>-->
